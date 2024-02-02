@@ -13,6 +13,10 @@ class Product(models.Model):
     total_sales = models.IntegerField(default = 0) # initialising both this and above as 0, i.e. when created total sales and number of orders for product should be 0
     total_ratings = models.IntegerField(default=0)
     total_rating_value = models.FloatField(default=0.0)
+    reviewed_by = models.ManyToManyField(User, related_name='reviewed_products', blank=True)
+
+    def reviewed_by_user(self, user):
+        return user in self.reviewed_by.all()
 
     def calculate_average_rating(self):
         if self.total_ratings == 0:

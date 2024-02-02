@@ -1,28 +1,42 @@
 {% extends 'myapp/base.html' %}
 
 {% block body %}
-<div class="w-1/2 m-20">
-    <h1 class="font-bold text-center text-lg">Edit New Product</h1>
-    <form class="shadow-lg p-10" action="" method="POST" enctype="multipart/form-data">
+<div class="flex flex-col justify-center items-center">
+    <h1 class="text-2xl width-100 text-center font-bold m-5 p-3 shadow-lg">Edit Product</h1>
+
+    <form class="shadow-lg p-8 w-1/2 flex flex-col items-center border border-gray-300 rounded-md" action=""
+        method="POST" enctype="multipart/form-data">
         {% csrf_token %}
-        <div>
-            <label for="">Name</label>
-            <div class="border rounded appearance-none py-2 px-2 mr-10">{{ product_form.name }}</div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ product_form.name.id_for_label }}"
+                class="mb-2 block text-md font-medium text-gray-900">Product Name:</label>
+            <input type="text" name="{{ product_form.name.name }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="{{ product_form.name.value }}">
         </div>
-        <div>
-            <label for="">Description</label>
-            <div class="border rounded appearance-none py-2 px-2 mr-10">{{ product_form.description }}</div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ product_form.description.id_for_label }}"
+                class="block font-medium text-gray-900 text-md mb-2">Description:</label>
+            <input type="text" name="{{ product_form.description.name }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="{{ product_form.description.value }}">
         </div>
-        <div>
-            <label for="">Price</label>
-            <div class="border rounded appearance-none py-2 px-2 mr-10">{{ product_form.price }}</div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ product_form.price.id_for_label }}"
+                class="block font-medium text-gray-900 text-md mb-2">Price:</label>
+            <input type="text" name="{{ product_form.price.name }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="{{ product_form.price.value }}">
         </div>
-        <div>
-            <label for="">Upload File</label>
-            <div class="rounded appearance-none py-2 px-2 mr-10">{{ product_form.file }}</div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ product_form.file.id_for_label }}"
+                class="block font-medium text-gray-900 text-md mb-2">File:</label>
+            {{ product_form.file }}
         </div>
+
         <div class="mt-6">
-            <button class="bg-green-500 hover:bg-green-700 text-white px-4 py-2" type="submit">Update Product</button>
+            <button class="bg-green-500 text-white px-4 py-2" type="submit">Update Product</button>
         </div>
     </form>
 
