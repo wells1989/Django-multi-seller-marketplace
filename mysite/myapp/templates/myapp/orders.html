@@ -1,0 +1,61 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+<div class="m-20 w-full border-lg flex items-center">
+    <h1 class="text-2xl text-center font-bold">Purchases linked to email</h1>
+    <h2 class=" px-2 text-blue-700 text-2xl font-bold">{{ request.user.email }}</h2>
+</div>
+
+<div class="m-20">
+    {% for purchase in purchases %}
+    {% for product in purchase.products.all %}
+    <div class="w-full font-bold text-xl border border-bottom-md p-3">
+        {{ purchase.created_on }}
+    </div>
+    <div class="w-full border border-blue-300">
+        <div class="flex justify-content items-center">
+            <div class="w-1/4">
+                <img class="h-40 w-40" src="{{ product.file.url }}" alt="product image">
+            </div>
+            <div class="w-1/4 text-center">
+                <h3 class="font-bold pb-2">{{ product.name }}</h3>
+                <h4>{{ product.description }}</h4>
+                <h4 class="text-green-700 font-bold">£{{ purchase.amount }}</h4>
+            </div>
+            <div class="w-1/4 text-center">
+                <a class="bg-green-500 hover:bg-green-700 font-bold rounded-lg text-white p-5"
+                    href="{% url 'detail' product.id %}">View Product</a>
+            </div>
+
+            <div class="w-1/4">
+                <form method="post" action="{% url 'orders' %}" class="flex items-center">
+                    {% csrf_token %}
+                    <div>
+                        <input type="hidden" name="order_id" value="{{ purchase.id }}">
+                        <label for="rating" class="mr-2 w-full">Rating (0-5): </label>
+                        <input class="w-3/4 bg-blue-100 p-1 border rounded" type="number" name="rating" min="0" max="5">
+                    </div>
+                    <button class="bg-purple-500 rounded m-2 hover:bg-purple-700 font-bold text-white px-2 py-1"
+                        type="submit">
+                        Submit Rating
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div>
+
+
+{% endblock %}
+
+{% for purchase in purchases %}
+{% for product in purchase.products.all %}
+{{ product.name }}
+{{ product.file.url }} {# Assuming `file` is an ImageField or FileField #}
+{{ purchase.amount }}
+{{ purchase.created_on }}
+{% endfor %}
+{% endfor %}

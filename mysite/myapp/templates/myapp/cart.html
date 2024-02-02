@@ -1,0 +1,116 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+<h2 class="text-4xl p-5 w-full shadow-lg text-center">Your Shopping Cart</h2>
+
+{% if cart.items.all %}
+
+{% for item in cart.items.all %}
+<div class="flex justify-around items-center shadow-md p-5 ml-10 mr-10">
+    <div class="h40 w-40">
+        <img src="{{ item.product.file.url }}" alt="{{ item.product.name }}">
+    </div>
+    <div class="">
+        {{ item.product.name }}
+    </div>
+    <div class="">
+        Quantity: {{ item.quantity }}
+    </div>
+    <div class="font-bold text-green-700">
+        Price {{ item.product.price }}
+    </div>
+    <a class="rounded-lg bg-red-500 hover:bg-red-700 font-bold text-black px-4 py-2" href="#"
+        onclick="removeFromCart('{{ item.product.id }}')">Remove from cart</a>
+</div>
+{% endfor %}
+
+<div class="flex justify-around items-center">
+    <button id="checkout-button"
+        class="rounded-lg bg-green-500 hover:bg-green-700 font-bold text-white px-4 py-2">Checkout!</button>
+    <h4 class="text-xl font-bold text-blue-700 text-center p-5 m-5">Total: £{{ cart.total|floatformat:2 }}</h4>
+
+</div>
+
+<div id="myemail" hidden>
+    {{ request.user.email }}
+</div>
+
+{% else %}
+<h2 class="text-3xl p-5 w-full shadow-lg text-center">Your Shopping Cart is Empty</h2>
+{% endif %}
+
+<script src="https://js.stripe.com/v3/"></script>
+
+
+<script type="text/javascript">
+
+    // removing from cart logic
+    function removeFromCart(productId) {
+        fetch("{% url 'remove_from_cart' product_id=0 %}".replace('0', productId))
+            .then(response => {
+                if (response.ok) {
+                    return response.json();
+                }
+                throw new Error('Failed to remove item from cart');
+            })
+            .then(data => {
+                alert('Item removed from cart');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+
+    // checkout logic
+    var stripe = Stripe('{{ stripe_publishable_key }}') // getting the stripe key from context, and using it to initiate a Stripe session
+
+    var checkoutButton = document.getElementById('checkout-button')
+
+    checkoutButton.addEventListener('click', function () {
+        var email = document.getElementById('myemail').innerText
+
+        if (email.length == 0) {
+            alert("Please enter your email address")
+            return
+        }
+
+        fetch("{% url 'api_checkout_session' %}", {
+            method: 'POST',
+            body: JSON.stringify({ 'email': email })
+        })
+            /* Above fetch network request: Making a request to the url named 'api_checkout_session' giving the product id
+            .stringify converts  JS object (expects an object as it's argument) into a JSON string, converting it e.g. into a JSON string, e.g. {"email": "user@example.com"} This could be good for having multiple pieces of data in key-value pairs etc
+            ** alt to above, could do body: email, as the body can just be a single string value (and thus no need for .stringify method)
+            */
+
+            .then(function (response) {
+                return response.json() // getting the json response, i.e. from the return JsonResponse({'sessionId:checkout_session.id'}) in create_checkout_session view
+            }).then(function (session) {
+                console.log('Session received:', session);
+                return stripe.redirectToCheckout({ sessionId: session.sessionId }); //
+            }).then(function (result) {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            }).catch(function (error) {
+                console.log('Error:', error);
+            });
+    });
+    /*
+    NOTE: in create_checkout_session view, return JsonResponse({'sessionId': checkout_session.id})
+    So the first promise parses that response
+    the 2nd promise uses the session, i.e. the return value from the 1st promise, and redirects to stripe checkout, using the sessionID as the value of the 'sessionId' key in the response, i.e checkout_session.id
+    the 3rd promise takes the result (the return value from the 2nd)  and returns an error alert
+    the 4th promise takes the error from the 3rd and console logs it
+    */
+
+
+
+
+
+
+</script>
+
+{% endblock %}
