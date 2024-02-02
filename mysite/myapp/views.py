@@ -1,5 +1,5 @@
 from django.shortcuts import render, reverse, get_object_or_404, redirect
-from .models import Product, OrderDetail
+from .models import Product, OrderDetail, Cart, CartItem
 from django.conf import settings
 import stripe
 from django.views.decorators.csrf import csrf_exempt
@@ -11,6 +11,51 @@ from django.db.models import Sum
 import datetime
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
+from django.db.models import F
+
+# cart views
+@login_required
+def view_cart(request):
+    stripe_publishable_key = settings.STRIPE_PUBLISHABLE_KEY
+    cart = Cart.objects.get_or_create(customer=request.user)[0]
+    return render(request, 'myapp/cart.html', {'cart': cart, 'stripe_publishable_key': stripe_publishable_key})
+
+@login_required
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart, created = Cart.objects.get_or_create(customer=request.user)
+
+    cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
+
+    if not created:
+        # If the cart item already exists, just increase the quantity
+        cart_item.quantity = F('quantity') + 1
+        cart_item.save()
+
+    cart.total = F('total') + product.price  # Update total based on the product price
+    cart.save()
+
+    print(f"Cart total after adding: {cart.total}")  # Add this line for debugging
+
+    return JsonResponse({'message': 'Item added to cart'})
+
+@login_required
+def remove_from_cart(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    cart = Cart.objects.get(customer=request.user)
+
+    cart_item = get_object_or_404(CartItem, cart=cart, product=product)
+    if cart_item.quantity > 1:
+        cart_item.quantity -= 1
+        cart_item.save()
+    else:
+        cart_item.delete()
+
+    cart.total -= product.price * cart_item.quantity  # Update total based on quantity
+    cart.save()
+
+    return JsonResponse({'message': 'Item removed from cart'})
+
 
 # Create your views here.
 def index(request):
@@ -29,44 +74,51 @@ def detail(request, id):
 
 # to make a cross site request that is normally disallowed in django, need the decorator ...
 @csrf_exempt
-def create_checkout_session(request, id):
+def create_checkout_session(request):
     request_data = json.loads(request.body)
-    product = Product.objects.get(id=id)
+    email = request_data.get('email', '').strip()
+
+    cart = Cart.get_cart(request.user)
 
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
     # Use a database transaction to ensure atomicity
     with transaction.atomic():
-        checkout_session = stripe.checkout.Session.create(
-            customer_email=request_data.get('email', '').strip(),
-            payment_method_types=['card'],
-            line_items=[
-                {
-                    'price_data': {
-                        'currency': 'usd',
-                        'product_data': {
-                            'name': product.name,
-                        },
-                        'unit_amount': int(product.price * 100)
+        line_items = [
+            {
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': item.product.name,
                     },
-                    'quantity': 1,
-                }
-            ],
+                    'unit_amount': int(item.product.price * 100)
+                },
+                'quantity': item.quantity,
+            }
+            for item in cart.items.all()
+        ]
+
+        checkout_session = stripe.checkout.Session.create(
+            customer_email=email,
+            payment_method_types=['card'],
+            line_items=line_items,
             mode='payment',
-            success_url=request.build_absolute_uri(reverse('success')) +
-                        "?session_id={CHECKOUT_SESSION_ID}",
+            success_url=request.build_absolute_uri(reverse('success')) + "?session_id={CHECKOUT_SESSION_ID}",
             cancel_url=request.build_absolute_uri(reverse('failed')),
         )
 
-        order = OrderDetail()
-        order.customer_email = request_data['email']
-        order.product = product
+        # Create an order for each cart item
+        for item in cart.items.all():
+            order = OrderDetail.objects.create(
+                customer_email=email,
+                amount=item.product.price * item.quantity,
+                stripe_payment_intent='dummy_payment_intent',
+                has_paid=False
+            )
+            order.products.add(item.product)
 
-        # Use a dummy payment_intent for development purposes, issue with obtaining this from stripe
-        order.stripe_payment_intent = 'dummy_payment_intent'
-
-        order.amount = int(product.price)
-        order.save()
+        # Clear the cart after processing
+        cart.delete()
 
     return JsonResponse({'sessionId': checkout_session.id})
 
@@ -155,6 +207,9 @@ def dashboard(request):
     
     # randomly generating rating
     for product in products:
+        orders = OrderDetail.objects.filter(products=product)
+        product.total_orders = orders.count()
+        product.total_revenue = product.price * orders.count()
         product.random_rating = round(random.uniform(0.0, 5.0), 1)
 
     return render(request, 'myapp/dashboard.html', {'products': products})
@@ -200,38 +255,39 @@ def sales(request):
     if request.user.is_superuser:
         orders = OrderDetail.objects.all()
     else:
-        orders = OrderDetail.objects.filter(product__seller=request.user) # __ syntax for getting the product field of OrderDetail, a foreign key for Product, then accessing the .seller property of the Product model
+        orders = OrderDetail.objects.filter(products__seller=request.user) # __ syntax for getting the product field of OrderDetail, a foreign key for Product, then accessing the .seller property of the Product model
 
     total_sales = orders.aggregate(Sum('amount')) # taking Sum of the 'amount' field
     user = request.user
 
     # import datetime
-    # calculating last year's sales sum
-    last_year = datetime.date.today() - datetime.timedelta(days=365) # i.e. today minus 365
-    last_year_orders = orders.filter(created_on__gt=last_year) # filtering the orders object, due to the above if else statements still want to apply the user restriction unless its the superuser
-    yearly_sales = last_year_orders.aggregate(Sum('amount'))
-
     # calculating last year's (last 365 days) sales sum
     last_year = datetime.date.today() - datetime.timedelta(days=365) # i.e. today minus 365
     last_year_orders = orders.filter(created_on__gt=last_year) # filtering the orders object, due to the above if else statements still want to apply the user restriction unless its the superuser
     yearly_sales = last_year_orders.aggregate(Sum('amount'))
 
     # calculating last 30 days sales sum
-    last_year = datetime.date.today() - datetime.timedelta(days=30) 
-    last_year_orders = orders.filter(created_on__gt=last_year) 
-    monthly_sales = last_year_orders.aggregate(Sum('amount'))
+    last_month = datetime.date.today() - datetime.timedelta(days=30) 
+    last_month_orders = orders.filter(created_on__gt=last_month) 
+    monthly_sales = last_month_orders.aggregate(Sum('amount'))
 
     # calculating last 7 days sales sum
-    last_year = datetime.date.today() - datetime.timedelta(days=7) 
-    last_year_orders = orders.filter(created_on__gt=last_year) 
-    weekly_sales = last_year_orders.aggregate(Sum('amount'))
+    last_week = datetime.date.today() - datetime.timedelta(days=7) 
+    last_week_orders = orders.filter(created_on__gt=last_week) 
+    weekly_sales = last_week_orders.aggregate(Sum('amount'))
 
     # everyday sum for each day for the past 30 days
     daily_sales_sums = orders.values('created_on__date').order_by('created_on__date').annotate(sum=Sum('amount'))
     # now daily_sales_sums will be an object list, e.g. <QuerySet [{'sum': 355, 'created_on__date': datetime.date(2024, 2, 1)}]>
 
     # sales sum per product (similar to above, will produce an object list)
-    product_sales_sums = orders.values('product__name').order_by('product__name').annotate(sum=Sum('amount'))
-    print(product_sales_sums)
+    product_sales_sums = orders.values('products__name').order_by('products__name').annotate(sum=Sum('amount'))
 
     return render(request, 'myapp/sales.html', {'orders': orders, 'total_sales': total_sales, 'user': user, 'yearly_sales': yearly_sales, 'monthly_sales':monthly_sales, 'weekly_sales': weekly_sales, 'daily_sales_sums': daily_sales_sums, 'product_sales_sums':product_sales_sums})
+
+# orders view
+def orders(request):
+
+    purchases = OrderDetail.objects.filter(customer_email=request.user.email) 
+
+    return render(request, 'myapp/orders.html', {'purchases': purchases})

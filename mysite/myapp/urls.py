@@ -7,7 +7,7 @@ urlpatterns = [
     path("product/<int:id>", views.detail, name="detail"),
     path('success/', views.payment_success_view, name='success'),
     path('failed/', views.payment_failed_view, name='failed'),
-    path('api/checkout-session/<int:id>/', views.create_checkout_session, name='api_checkout_session'),
+    path('api/checkout-session/', views.create_checkout_session, name='api_checkout_session'),
     path('createproduct/', views.create_product, name="createproduct"),
     path('editproduct/<int:id>', views.product_edit, name="editproduct"),
     path('delete/<int:id>', views.product_delete, name="delete"),
@@ -18,4 +18,8 @@ urlpatterns = [
     path('invalid', views.invalid, name="invalid"),
     path('purchases', views.my_purchases, name="purchases"),
     path('sales', views.sales, name="sales"),
+    path('cart/', views.view_cart, name='view_cart'),
+    path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+    path('remove_from_cart/<int:product_id>/', views.remove_from_cart, name='remove_from_cart'),
+    path('orders', views.orders, name='orders'),
 ]

@@ -18,9 +18,24 @@ class Product(models.Model):
 
 class OrderDetail(models.Model):
     customer_email = models.EmailField()
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    amount = models.IntegerField()
+    products = models.ManyToManyField(Product)
+    amount = models.FloatField()
     stripe_payment_intent = models.CharField(max_length=200)# (id that stripe associates with the order) allows you to check the order has been paid by cross referencing this in stripe system
     has_paid = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now_add=True)
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey('Cart', related_name='items', on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+
+class Cart(models.Model):
+    customer = models.ForeignKey(User, on_delete=models.CASCADE)
+    total = models.FloatField(default=0)
+
+    @classmethod
+    def get_cart(cls, customer):
+        cart, created = cls.objects.get_or_create(customer=customer)
+        return cart

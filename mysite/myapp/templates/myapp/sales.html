@@ -16,25 +16,25 @@
 
 <div class="shadow-lg p-10 m-5 flex justify-around">
     <div class="block border border-blue-500 p-10 bg-blue-100">
-        <div class="font-bold text-green-600 text-5xl">£{{ total_sales.amount__sum }}</div>
+        <div class="font-bold text-green-600 text-5xl">£{{ total_sales.amount__sum|floatformat:2 }}</div>
         <!-- total_sales returns dictionary e.g. {'amount__sum': 120} -->
         <div class="mt-5">Total sales</div>
     </div>
 
     <div class="block border border-blue-200 p-10">
-        <div class="font-bold text-blue-600 text-4xl">£{{ yearly_sales.amount__sum }}</div>
+        <div class="font-bold text-blue-600 text-4xl">£{{ yearly_sales.amount__sum|floatformat:2 }}</div>
         <!-- total_sales returns dictionary e.g. {'amount__sum': 120} -->
         <div class="mt-5">Last 365 days</div>
     </div>
 
     <div class="block border border-blue-200 p-10">
-        <div class="font-bold text-orange-600 text-4xl">£{{ monthly_sales.amount__sum }}</div>
+        <div class="font-bold text-orange-600 text-4xl">£{{ monthly_sales.amount__sum|floatformat:2 }}</div>
         <!-- total_sales returns dictionary e.g. {'amount__sum': 120} -->
         <div class="mt-5">Last 30 days</div>
     </div>
 
     <div class="block border border-blue-200 p-10">
-        <div class="font-bold text-purple-600 text-4xl">£{{ weekly_sales.amount__sum }}</div>
+        <div class="font-bold text-purple-600 text-4xl">£{{ weekly_sales.amount__sum|floatformat:2 }}</div>
         <!-- total_sales returns dictionary e.g. {'amount__sum': 120} -->
         <div class="mt-5">Last 7 days</div>
     </div>
@@ -63,7 +63,7 @@
                     {{ daily_sales_sum.created_on__date}}
                 </div>
                 <div class="w-1/2 text-center text-green-700 font-bold day-sum">
-                    £{{ daily_sales_sum.sum}}
+                    £{{ daily_sales_sum.sum|floatformat:2 }}
                 </div>
             </div>
             {% endfor %}
@@ -103,10 +103,10 @@
             {% for product_sales_sum in product_sales_sums %}
             <div class="flex m-10 shadow-md p-2">
                 <div class="w-1/2 text-center product-name">
-                    {{ product_sales_sum.product__name}}
+                    {{ product_sales_sum.products__name}}
                 </div>
                 <div class="w-1/2 text-center text-green-700 font-bold product-sum">
-                    £{{ product_sales_sum.sum}}
+                    £{{ product_sales_sum.sum|floatformat:2 }}
                 </div>
             </div>
             {% endfor %}

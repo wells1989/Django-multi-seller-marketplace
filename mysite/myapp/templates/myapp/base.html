@@ -26,7 +26,8 @@
                 <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg"
                     href="{% url 'dashboard' %}">Dashboard</a>
                 <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg" href="{% url 'sales' %}">Sales</a>
-                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg" href="">Orders</a>
+                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg"
+                    href="{% url 'orders' %}">Orders</a>
                 <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg"
                     href="{% url 'createproduct' %}">Create Product</a>
                 <form action="{% url 'logout' %}" method="post">

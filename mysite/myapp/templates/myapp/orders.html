@@ -1,0 +1,44 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+<div class="m-20 w-full border-lg flex items-center">
+    <h1 class="text-2xl text-center font-bold">Purchases linked to email</h1>
+    <h2 class=" px-2 text-blue-700 text-2xl font-bold">{{ request.user.email }}</h2>
+</div>
+
+<div class="m-20">
+    {% for purchase in purchases %}
+    {% for product in purchase.products.all %}
+    <div class="w-full font-bold text-xl text-center border border-bottom-md p-3">
+        {{ purchase.created_on }}
+    </div>
+    <div class="w-full border border-blue-300">
+        <div class="flex justify-content items-center">
+            <div class="w-1/4">
+                <img class="h-40 w-40" src="{{ product.file.url }}" alt="product image">
+            </div>
+            <div class="w-2/4 text-center">
+                <h3 class="font-bold pb-2">{{ product.name }}</h3>
+                <h4>{{ product.description }}</h4>
+            </div>
+            <div class="w-1/4 text-center">
+                <h3 class="text-green-700 font-bold">£{{ purchase.amount }}</h3>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    {% endfor %}
+</div>
+
+
+{% endblock %}
+
+{% for purchase in purchases %}
+{% for product in purchase.products.all %}
+{{ product.name }}
+{{ product.file.url }} {# Assuming `file` is an ImageField or FileField #}
+{{ purchase.amount }}
+{{ purchase.created_on }}
+{% endfor %}
+{% endfor %}
