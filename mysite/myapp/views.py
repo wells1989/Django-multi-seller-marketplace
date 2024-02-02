@@ -210,7 +210,9 @@ def dashboard(request):
         orders = OrderDetail.objects.filter(products=product)
         product.total_orders = orders.count()
         product.total_revenue = product.price * orders.count()
-        product.random_rating = round(random.uniform(0.0, 5.0), 1)
+        product.random_rating = product.average_rating
+
+        # dev onlyproduct.random_rating = round(random.uniform(0.0, 5.0), 1)
 
     return render(request, 'myapp/dashboard.html', {'products': products})
 
@@ -290,4 +292,29 @@ def orders(request):
 
     purchases = OrderDetail.objects.filter(customer_email=request.user.email) 
 
+    return render(request, 'myapp/orders.html', {'purchases': purchases})
+
+# ratings view
+def orders(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        rating = request.POST.get('rating')
+        
+        order_detail = OrderDetail.objects.get(id=order_id)
+        order_detail.product_rating = rating
+        order_detail.save()
+
+        for product in order_detail.products.all():
+            product.total_ratings += 1
+            product.total_rating_value += int(rating)
+            product.save()
+
+        # Calculate the average rating for each product after all ratings are updated
+        for product in Product.objects.all():
+            product.average_rating = product.calculate_average_rating()
+            product.save()
+
+        return redirect('orders')
+
+    purchases = OrderDetail.objects.filter(customer_email=request.user.email) 
     return render(request, 'myapp/orders.html', {'purchases': purchases})

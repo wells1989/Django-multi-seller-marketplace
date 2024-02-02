@@ -10,7 +10,7 @@
 <div class="m-20">
     {% for purchase in purchases %}
     {% for product in purchase.products.all %}
-    <div class="w-full font-bold text-xl text-center border border-bottom-md p-3">
+    <div class="w-full font-bold text-xl border border-bottom-md p-3">
         {{ purchase.created_on }}
     </div>
     <div class="w-full border border-blue-300">
@@ -18,12 +18,29 @@
             <div class="w-1/4">
                 <img class="h-40 w-40" src="{{ product.file.url }}" alt="product image">
             </div>
-            <div class="w-2/4 text-center">
+            <div class="w-1/4 text-center">
                 <h3 class="font-bold pb-2">{{ product.name }}</h3>
                 <h4>{{ product.description }}</h4>
+                <h4 class="text-green-700 font-bold">£{{ purchase.amount }}</h4>
             </div>
             <div class="w-1/4 text-center">
-                <h3 class="text-green-700 font-bold">£{{ purchase.amount }}</h3>
+                <a class="bg-green-500 hover:bg-green-700 font-bold rounded-lg text-white p-5"
+                    href="{% url 'detail' product.id %}">View Product</a>
+            </div>
+
+            <div class="w-1/4">
+                <form method="post" action="{% url 'orders' %}" class="flex items-center">
+                    {% csrf_token %}
+                    <div>
+                        <input type="hidden" name="order_id" value="{{ purchase.id }}">
+                        <label for="rating" class="mr-2 w-full">Rating (0-5): </label>
+                        <input class="w-3/4 bg-blue-100 p-1 border rounded" type="number" name="rating" min="0" max="5">
+                    </div>
+                    <button class="bg-purple-500 rounded m-2 hover:bg-purple-700 font-bold text-white px-2 py-1"
+                        type="submit">
+                        Submit Rating
+                    </button>
+                </form>
             </div>
         </div>
     </div>

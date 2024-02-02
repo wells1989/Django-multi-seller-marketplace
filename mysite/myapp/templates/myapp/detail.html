@@ -5,13 +5,12 @@
 <div class="flex p-10 justify-center items-center">
     <!-- left div -->
     <div class="">
-        <img class="max-h-96"
-            src="https://img.freepik.com/free-photo/community-concept-with-hands-people_23-2147993404.jpg?size=626&ext=jpg&ga=GA1.1.1446778661.1706618687&semt=sph"
+        <img class="max-h-80" src="{{ product.file.url }}""
             alt="">
     </div>
 
     <!-- right div -->
-    <div class="pl-10">
+    <div class=" pl-10">
         <div class="text-4xl mb-3">{{ product.name }}</div>
         <div class="mb-4">{{ product.description }}</div>
         <div class="mb-4 text-green-600 font-bold">£{{ product.price }}</div>
