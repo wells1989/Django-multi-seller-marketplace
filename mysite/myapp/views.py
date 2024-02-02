@@ -10,6 +10,7 @@ import random
 from django.db.models import Sum
 import datetime
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 
 # Create your views here.
 def index(request):
@@ -34,37 +35,40 @@ def create_checkout_session(request, id):
 
     stripe.api_key = settings.STRIPE_SECRET_KEY
 
-    checkout_session = stripe.checkout.Session.create(
-        customer_email = request_data.get('email', '').strip(),
-        payment_method_types = ['card'],
-        line_items=[
-            {
-                'price_data':{
-                    'currency': 'usd',
-                    'product_data':{
-                        'name':product.name,
+    # Use a database transaction to ensure atomicity
+    with transaction.atomic():
+        checkout_session = stripe.checkout.Session.create(
+            customer_email=request_data.get('email', '').strip(),
+            payment_method_types=['card'],
+            line_items=[
+                {
+                    'price_data': {
+                        'currency': 'usd',
+                        'product_data': {
+                            'name': product.name,
+                        },
+                        'unit_amount': int(product.price * 100)
                     },
-                    'unit_amount': int(product.price * 100)
-                },
-                'quantity': 1,
-            }
-        ],
-        mode='payment',
-        success_url = request.build_absolute_uri(reverse('success')) +
-        "?session_id={CHECKOUT_SESSION_ID}",
-        cancel_url = request.build_absolute_uri(reverse('failed')),
-        # above two, the url the user will be directed to if it is successful / fails
-    )
+                    'quantity': 1,
+                }
+            ],
+            mode='payment',
+            success_url=request.build_absolute_uri(reverse('success')) +
+                        "?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url=request.build_absolute_uri(reverse('failed')),
+        )
 
-    order = OrderDetail()
-    order.customer_email = request_data['email']
-    order.product = product
-    order.stripe_payment_intent = checkout_session['payment_intent'] # checkout_session object is created using the stripe.checkout.Session.create method, which has the 'payment_intent' attribute
-    order.amount = int(product.price)
-    order.save()
+        order = OrderDetail()
+        order.customer_email = request_data['email']
+        order.product = product
 
-    return JsonResponse({'sessionId': checkout_session.id}) # returns a JSON response to the client, specifically a dictionary with the key 'sessionId' that will be converted to JSON. Purpose of this is to provide the client with the sessionId associated with the newly created checkout session 
+        # Use a dummy payment_intent for development purposes, issue with obtaining this from stripe
+        order.stripe_payment_intent = 'dummy_payment_intent'
 
+        order.amount = int(product.price)
+        order.save()
+
+    return JsonResponse({'sessionId': checkout_session.id})
 
 def payment_success_view(request):
     session_id = request.GET.get('session_id') # i.e. the CHECKOUT_SESSION_ID if successful
@@ -91,6 +95,7 @@ def payment_success_view(request):
 def payment_failed_view(request):
     return render(request, 'myapp/failed.html')
 
+
 @login_required
 def create_product(request):
 
@@ -104,6 +109,7 @@ def create_product(request):
 
     product_form = ProductForm()
     return render(request, 'myapp/create_product.html', {'product_form': product_form})
+
 
 @login_required
 def product_edit(request,id):
@@ -123,6 +129,7 @@ def product_edit(request,id):
             return redirect('index')
 
     return render(request, 'myapp/product_edit.html', {'product_form': product_form, 'product': product})
+
 
 @login_required
 def product_delete(request,id):
