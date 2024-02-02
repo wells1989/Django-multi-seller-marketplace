@@ -1,0 +1,61 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+<div class="flex justify-between">
+    <div class=" w-full text-center shadow-lg m-5 p-3 font-bold text-xl">My Orders</div>
+
+</div>
+
+<div class="products-container p-10 m-5">
+    <div class="flex m-3 p-2 justify-between items-center shadow-lg font-bold text-lg text-blue-600">
+        <div class="w-1/4">
+            <h3>Product Name</h3>
+        </div>
+
+        <div class="w-1/4">
+            <h3>Amount Paid</h3>
+        </div>
+
+        <div class="w-1/4">
+            <h3>Order Date</h3>
+        </div>
+
+        <div class="w-1/4">
+            {% if request.user.is_superuser %}
+            <h3>Customer Email</h3>
+            {% else %}
+            <h3>Download Link</h3>
+            {% endif %}
+        </div>
+
+    </div>
+
+    {% for order in orders %}
+    <div class="flex m-5 p-2 justify-between items-center shadow-lg">
+        <div class="w-1/4">
+            <h3>{{ order.product.name }}</h3>
+        </div>
+
+        <div class="w-1/4">
+            <h3 class="text-green-700 font-bold">£{{ order.amount }}</h3>
+        </div>
+
+        <div class="w-1/4">
+            <h3>{{ order.created_on }}</h3>
+        </div>
+
+        <div class="w-1/4">
+            {% if request.user.is_superuser %}
+            <h3>{{ order.customer_email }}</h3>
+            {% else %}
+            <a class="bg-blue-500 hover:bg-blue-700 text-white text-md rounded-lg p-2"
+                href="{{ order.product.file.url }}" download> Click
+                to download</a>
+            {% endif %}
+        </div>
+
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

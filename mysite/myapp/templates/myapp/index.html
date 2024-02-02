@@ -1,0 +1,39 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+{% if user and user.is_authenticated %}
+<h1 class="text-lg w-100 text-center p-2">Welcome {{ user }}</h1>
+{% else %}
+<h1 class="text-lg w-100 text-center p-2">Welcome to the site!</h1>
+{% endif %}
+
+<div class="product-container flex flex-wrap justify-center">
+    {% for product in products %}
+    <div class="product shadow-lg w-1/4 rounded-lg m-10">
+        <div class="product-image">
+            <img class="max-h-80 max-w-80" src="{{ product.file.url }}" alt="">
+        </div>
+        <div class="p-5">
+            <div class="font-bold">
+                {{ product.name }}
+            </div>
+            <div>
+                {{ product.description }}
+            </div>
+            <div>
+                Sold by: <spam class="font-bold text-blue-700">{{ product.seller }}</spam>
+            </div>
+            <div class="text-green-600 font-bold">
+                £{{ product.price }}
+            </div>
+            <div class="mt-5">
+                <a class="bg-green-500 text-white px-4 py-2" href="{% url 'detail' product.id %}">View Details</a>
+            </div>
+        </div>
+    </div>
+
+    {% endfor %}
+</div>
+
+{% endblock %}

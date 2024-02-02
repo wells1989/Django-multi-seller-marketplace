@@ -1,0 +1,36 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+<div class="flex flex-col justify-center items-center">
+    <h1 class="text-2xl width-100 text-center font-bold m-5 p-3 shadow-lg">Log In</h1>
+
+    <form class="shadow-lg p-8 w-1/2 flex flex-col items-center border border-gray-300 rounded-md" action=""
+        method="POST">
+        {% csrf_token %}
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ form.username.id_for_label }}"
+                class="mb-2 block text-md font-medium text-gray-900">Username:</label>
+            <input type="text" name="{{ form.username.name }}" id="{{ form.username.id_for_label }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="">
+        </div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ form.password.id_for_label }}"
+                class="block font-medium text-gray-900 text-md mb-2">Password:</label>
+            <input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="">
+        </div>
+
+        <button type="submit"
+            class=" w-1/2 rounded-lg p-3 font-bold bg-green-500 hover:bg-green-700 text-xl text-white p-2 mt-5">Log
+            in</button>
+
+        <a class=" w-1/2 text-center rounded-lg p-2 font-bold bg-blue-500 hover:bg-blue-700 text-md text-white p-2 mt-5"
+            href="{% url 'register' %}">New User? Click here to register</a>
+
+    </form>
+</div>
+
+{% endblock %}

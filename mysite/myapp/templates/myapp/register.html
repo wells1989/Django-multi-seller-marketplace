@@ -1,0 +1,59 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+<div class="flex flex-col justify-center items-center">
+    <h1 class="text-2xl width-100 text-center font-bold m-5 p-3 shadow-lg">Register</h1>
+
+    <form class="shadow-lg p-8 w-1/2 flex flex-col items-center border border-gray-300 rounded-md" action=""
+        method="POST">
+        {% csrf_token %}
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ user_form.username.id_for_label }}"
+                class="mb-2 block text-md font-medium text-gray-900">Username:</label>
+            <input type="text" name="{{ user_form.username.name }}" id="{{ user_form.username.id_for_label }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="">
+        </div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ user_form.email.id_for_label }}"
+                class="block text-md font-medium text-gray-900 mb-2">Email:</label>
+            <input type="email" name="{{ user_form.email.name }}" id="{{ user_form.email.id_for_label }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="">
+        </div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ user_form.first_name.id_for_label }}"
+                class=" mb-2 block text-md font-medium text-gray-900">First
+                Name:</label>
+            <input type="text" name="{{ user_form.first_name.name }}" id="{{ user_form.first_name.id_for_label }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="">
+        </div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ user_form.password.id_for_label }}"
+                class="block font-medium text-gray-900 text-md mb-2">Password:</label>
+            <input type="password" name="{{ user_form.password.name }}" id="{{ user_form.password.id_for_label }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="">
+        </div>
+
+        <div class="mb-4 border-b border-gray-300 w-2/3">
+            <label for="{{ user_form.password2.id_for_label }}"
+                class="mb-2 block text-md font-medium text-gray-900">Confirm
+                Password:</label>
+            <input type="password" name="{{ user_form.password2.name }}" id="{{ user_form.password2.id_for_label }}"
+                class="w-full p-2 bg-blue-100 rounded hover:bg-blue-400" value="">
+        </div>
+
+        <button type="submit"
+            class="w-1/2 p-3 font-bold rounded-lg bg-blue-500 hover:bg-blue-700 text-xl text-white p-2 mt-5">Register</button>
+
+        <!-- button for existing users, redirect to login url endpoint -->
+        <a class="text-center w-1/2 rounded-lg p-3 font-bold bg-green-500 hover:bg-green-700 text-xl text-white p-2 mt-5"
+            href="{% url 'login' %}">Existing User? Click here to Login</a>
+
+    </form>
+</div>
+
+{% endblock %}

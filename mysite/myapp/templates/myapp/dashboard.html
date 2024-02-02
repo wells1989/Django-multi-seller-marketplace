@@ -1,0 +1,59 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+<div class="flex justify-between">
+    <div class="ml-20 mt-20 font-bold text-xl">My Products</div>
+    <div class="mr-20 mt-20">
+        <a href="{% url 'createproduct' %}" class="bg-green-500 font-bold hover:bg-green-700 text-white px-2 py-4">New
+            Product</a>
+    </div>
+</div>
+
+<div class="products-container p-10 m-5">
+    {% for product in products %}
+    <div class="flex m-5 p-2 justify-between shadow-lg">
+        <div class="flex w-1/5">
+            <img class="h-20 w-24" src="{{ product.file.url }}" alt="">
+
+            <!-- only showing the name and price normally, but on hover just showing the edit product, as it's absolute (shows over the other elements) with opacity of 100 on group hover (i.e. the relative-group) -->
+            <div class="relative group">
+                <a href="{% url 'editproduct' product.id %}">
+                    <div
+                        class="ml-5 opacity-0 group-hover:opacity-100 duration-300 absolute inset-x-0 bottom-0 p-4 justify-center items-end bg-white font-semibold group-hover:bg-green-700 w-max ">
+                        Edit Product</div>
+
+                    <div class="ml-5 opacity-100 group-hover:opacity-0">
+                        <div class="font-bold text-md">{{ product.name }}</div>
+                        <div class="font-bold text-sm text-green-700">£{{ product.price }}</div>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="flex flex-col items-center justify-around">
+            <a class="bg-red-500 hover:bg-red-700 text-white font-bold px-2 py-2 shadow-md"
+                href="{% url 'delete' product.id %}">Delete Product</a>
+        </div>
+
+        <!-- total earnings -->
+        <div>
+            <div class="text-2xl text-green-700 font-bold">£{{ product.total_sales_amount }}</div>
+            <div class="text-xs">Total Earnings</div>
+        </div>
+
+        <!-- total orders -->
+        <div>
+            <div class="text-2xl text-blue-700 font-bold">{{ product.total_sales }}</div>
+            <div class="text-xs">Total Orders</div>
+        </div>
+
+        <!-- rating -->
+        <div>
+            <div class="text-2xl text-purple-700 font-bold">{{ product.random_rating }}</div>
+            <div class="text-xs">Rating</div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

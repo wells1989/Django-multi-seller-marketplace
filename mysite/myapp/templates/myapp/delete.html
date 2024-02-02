@@ -1,0 +1,25 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+<div class="flex flex-col justify-center items-center mt-10">
+    <h1 class="text-2xl font-bold underline mb-4">Are you sure you want to delete this product?</h1>
+    <ul class="shadow-lg m-5">
+        <li class="border-b p-2">
+            <span class="font-bold">Name:</span> {{ product.name }}
+        </li>
+        <li class="border-b p-2">
+            <span class="font-bold">Description:</span> {{ product.description }}
+        </li>
+        <li class="p-2 text-green-600 font-bold w-1/3">
+            <span class="font-bold">Price:</span> {{ product.price }}
+        </li>
+    </ul>
+
+    <form action="{% url 'delete' product.id %}" method="POST">
+        {% csrf_token %}
+        <button class="bg-red-500 hover:bg-red-700 text-white font-bold px-4 py-2 m-4 shadow-md">Confirm delete</button>
+        <a class="bg-green-500 hover:bg-green-700 text-black font-bold px-4 py-2 m-4 shadow-md" href="">Return to
+            homepage</a>
+    </form>
+</div>
+{% endblock %}

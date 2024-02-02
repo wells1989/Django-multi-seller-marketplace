@@ -1,0 +1,14 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+<div class="flex flex-col justify-center items-center">
+    <h1 class="text-2xl width-100 text-center text-red-500 font-bold m-5 p-3 shadow-lg">Invalid Request</h1>
+
+    <p class="text-lg">Click <a class="text-blue-500 hover:text-blue-700" href="{% url 'dashboard' %}">here</a> to
+        return to
+        the Dashboard
+    </p>
+</div>
+
+{% endblock %}

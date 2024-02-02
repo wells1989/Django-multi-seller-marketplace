@@ -1,0 +1,12 @@
+{% extends 'myapp/base.html' %}
+
+{% block body %}
+
+<div class="grid place-items-center h-screen">
+    <div class="font-bold text-6xl">Payment Failed</div>
+
+    <a class="bg-green-500 font-bold text-white px-4 py-2" href="{% url 'index' %}" download>Return to
+        Homepage
+    </a>
+</div>
+{% endblock %}

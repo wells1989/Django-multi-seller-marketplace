@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+
+    <!-- nav bar-->
+    <nav class="shadow-lg">
+        <div class="flex flex-wrap justify-between items-center mx-auto px-4">
+            <a href="" class="flex items-center p-3">
+                <img class="h-6 mr-3"
+                    src="https://cdn2.iconfinder.com/data/icons/new_google_product_icons_by_carlosjj-dwke/128/apps_marketplace.png"
+                    alt="logo">
+                <span class="self-center text-xl font-bold">Digital Marketplace</span>
+            </a>
+            <div class="flex items-center">
+                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg" href="{% url 'index' %}">Home</a>
+                {% if user and user.is_authenticated %}
+                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg"
+                    href="{% url 'dashboard' %}">Dashboard</a>
+                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg" href="{% url 'sales' %}">Sales</a>
+                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg" href="">Orders</a>
+                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg"
+                    href="{% url 'createproduct' %}">Create Product</a>
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit"
+                        class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg">Logout</button>
+                </form>
+                {% else %}
+                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg" href="{% url 'login' %}">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    {% block body %}
+
+    {% endblock %}
+</body>
+
+</html>
