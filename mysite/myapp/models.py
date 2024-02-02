@@ -10,7 +10,7 @@ class Product(models.Model):
     price = models.FloatField()
     file = models.FileField(upload_to="uploads")
     total_sales_amount = models.FloatField(default=0)
-    total_sales = models.IntegerField(default = 0) # initialising both this and above as 0, i.e. when created total sales and number of orders for product should be 0
+    total_sales = models.IntegerField(default = 0)
     total_ratings = models.IntegerField(default=0)
     total_rating_value = models.FloatField(default=0.0)
     reviewed_by = models.ManyToManyField(User, related_name='reviewed_products', blank=True)
@@ -29,8 +29,6 @@ class Product(models.Model):
     
     @average_rating.setter
     def average_rating(self, value):
-        # You can implement a setter if needed
-        # This is optional and depends on your use case
         pass
 
     def __str__(self):
@@ -40,7 +38,7 @@ class OrderDetail(models.Model):
     customer_email = models.EmailField()
     products = models.ManyToManyField(Product)
     amount = models.FloatField()
-    stripe_payment_intent = models.CharField(max_length=200)# (id that stripe associates with the order) allows you to check the order has been paid by cross referencing this in stripe system
+    stripe_payment_intent = models.CharField(max_length=200)
     has_paid = models.BooleanField(default=False)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now_add=True)

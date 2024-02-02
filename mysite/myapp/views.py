@@ -6,7 +6,6 @@ from django.views.decorators.csrf import csrf_exempt
 import json
 from django.http import JsonResponse, HttpResponseNotFound
 from .forms import ProductForm, UserRegistrationForm
-import random
 from django.db.models import Sum
 import datetime
 from django.contrib.auth.decorators import login_required
@@ -28,14 +27,11 @@ def add_to_cart(request, product_id):
     cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
 
     if not created:
-        # If the cart item already exists, just increase the quantity
         cart_item.quantity = F('quantity') + 1
         cart_item.save()
 
-    cart.total = F('total') + product.price  # Update total based on the product price
+    cart.total = F('total') + product.price  
     cart.save()
-
-    print(f"Cart total after adding: {cart.total}")  # Add this line for debugging
 
     return JsonResponse({'message': 'Item added to cart'})
 
@@ -51,7 +47,7 @@ def remove_from_cart(request, product_id):
     else:
         cart_item.delete()
 
-    cart.total -= product.price * cart_item.quantity  # Update total based on quantity
+    cart.total -= product.price * cart_item.quantity 
     cart.save()
 
     return JsonResponse({'message': 'Item removed from cart'})
@@ -87,7 +83,7 @@ def create_checkout_session(request):
         line_items = [
             {
                 'price_data': {
-                    'currency': 'usd',
+                    'currency': 'gbp',
                     'product_data': {
                         'name': item.product.name,
                     },
@@ -123,13 +119,13 @@ def create_checkout_session(request):
     return JsonResponse({'sessionId': checkout_session.id})
 
 def payment_success_view(request):
-    session_id = request.GET.get('session_id') # i.e. the CHECKOUT_SESSION_ID if successful
+    session_id = request.GET.get('session_id') 
     if session_id is None:
         return HttpResponseNotFound()
     
     stripe.api_key = settings.STRIPE_SECRET_KEY
-    session = stripe.checkout.Session.retrieve(session_id) # retrieving the order ia the session_id
-    order = get_object_or_404(OrderDetail,stripe_payment_intent = session.payment_intent) # getting the order via the stripe payment_intent identifier
+    session = stripe.checkout.Session.retrieve(session_id) 
+    order = get_object_or_404(OrderDetail,stripe_payment_intent = session.payment_intent) 
 
     order.has_paid = True
 
@@ -152,11 +148,11 @@ def payment_failed_view(request):
 def create_product(request):
 
     if request.method == "POST":
-        product_form = ProductForm(request.POST, request.FILES) # gives you all the data in the submitted form, then the files
+        product_form = ProductForm(request.POST, request.FILES) 
         if product_form.is_valid():
-            new_product = product_form.save(commit=False) # saves it as an object, but doesn't save to the database yet
-            new_product.seller = request.user # logged in user making the request
-            new_product.save() # saves as a Product, as the ProductForm is based on creating a new Product model
+            new_product = product_form.save(commit=False) 
+            new_product.seller = request.user 
+            new_product.save() 
             return redirect('index')
 
     product_form = ProductForm()
@@ -167,14 +163,11 @@ def create_product(request):
 def product_edit(request,id):
     product = Product.objects.get(id=id)
 
-    # adding a check, if the logged in user is not the seller, cannot perform operation
     if not (request.user.is_superuser or product.seller == request.user):
         return redirect('invalid')
 
-    product_form = ProductForm(request.POST or None, request.FILES or None, instance=product) # will take the product data and fill the form with it
-    # above, or None used e.g. if it's a get request will not be data in the request.POST dictionary, so will be the initial product.
-    # BUT if there is a post request, will use the request.POST and request.FILES (i.e. inputted data) then enter the if statement below to save it etc
-    
+    product_form = ProductForm(request.POST or None, request.FILES or None, instance=product) 
+
     if request.method == "POST":
         if product_form.is_valid():
             product_form.save()
@@ -205,14 +198,12 @@ def dashboard(request):
     else:
         products = Product.objects.filter(seller=request.user)
     
-    # randomly generating rating
     for product in products:
         orders = OrderDetail.objects.filter(products=product)
         product.total_orders = orders.count()
         product.total_revenue = product.price * orders.count()
         product.random_rating = product.average_rating
 
-        # dev onlyproduct.random_rating = round(random.uniform(0.0, 5.0), 1)
 
     return render(request, 'myapp/dashboard.html', {'products': products})
 
@@ -221,13 +212,13 @@ def dashboard(request):
 def register(request):
 
     if request.method == "POST":
-        user_form = UserRegistrationForm(request.POST) # user_form is the form with the data from request.POST, i.e. inputted data
+        user_form = UserRegistrationForm(request.POST)
         
         # saving data and adding passwords, then saving user
-        new_user = user_form.save(commit=False) # .save() method would only save the fields in the fields array in the form 
+        new_user = user_form.save(commit=False)
         new_user.set_password(user_form.cleaned_data['password'])    
         new_user.save()
-        return redirect('index') # need to change to log in page, but not yet created
+        return redirect('index')
 
     user_form = UserRegistrationForm()
     return render(request, 'myapp/register.html', {'user_form': user_form})
@@ -257,15 +248,14 @@ def sales(request):
     if request.user.is_superuser:
         orders = OrderDetail.objects.all()
     else:
-        orders = OrderDetail.objects.filter(products__seller=request.user) # __ syntax for getting the product field of OrderDetail, a foreign key for Product, then accessing the .seller property of the Product model
+        orders = OrderDetail.objects.filter(products__seller=request.user) 
 
-    total_sales = orders.aggregate(Sum('amount')) # taking Sum of the 'amount' field
+    total_sales = orders.aggregate(Sum('amount')) 
     user = request.user
 
-    # import datetime
     # calculating last year's (last 365 days) sales sum
-    last_year = datetime.date.today() - datetime.timedelta(days=365) # i.e. today minus 365
-    last_year_orders = orders.filter(created_on__gt=last_year) # filtering the orders object, due to the above if else statements still want to apply the user restriction unless its the superuser
+    last_year = datetime.date.today() - datetime.timedelta(days=365) 
+    last_year_orders = orders.filter(created_on__gt=last_year) 
     yearly_sales = last_year_orders.aggregate(Sum('amount'))
 
     # calculating last 30 days sales sum
@@ -280,7 +270,6 @@ def sales(request):
 
     # everyday sum for each day for the past 30 days
     daily_sales_sums = orders.values('created_on__date').order_by('created_on__date').annotate(sum=Sum('amount'))
-    # now daily_sales_sums will be an object list, e.g. <QuerySet [{'sum': 355, 'created_on__date': datetime.date(2024, 2, 1)}]>
 
     # sales sum per product (similar to above, will produce an object list)
     product_sales_sums = orders.values('products__name').order_by('products__name').annotate(sum=Sum('amount'))

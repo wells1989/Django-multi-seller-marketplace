@@ -50,12 +50,3 @@
 
 
 {% endblock %}
-
-{% for purchase in purchases %}
-{% for product in purchase.products.all %}
-{{ product.name }}
-{{ product.file.url }} {# Assuming `file` is an ImageField or FileField #}
-{{ purchase.amount }}
-{{ purchase.created_on }}
-{% endfor %}
-{% endfor %}

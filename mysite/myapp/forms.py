@@ -16,17 +16,8 @@ class UserRegistrationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['username','email','first_name'] # standard fields for User model
+        fields = ['username','email','first_name'] 
 
-    # NOTE: above, error if trying to put password and password1 in the fields array, hence separately defining them, will still show up on the form alongside the items in fields[] 
-
-    """
-    prior code (BUT, isn't called anywhere so not included in forms validation process)
-    def check_password(self):
-        if self.cleaned_data['password']!=self.cleaned_data['password2']:
-            raise forms.ValidationError('Password fields do not match')
-        return self.cleaned_data['password2']
-    """
     
     # adding password match check to forms validation process
     def clean(self):

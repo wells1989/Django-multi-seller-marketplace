@@ -17,25 +17,21 @@
 <div class="shadow-lg p-10 m-5 flex justify-around">
     <div class="block border border-blue-500 p-10 bg-blue-100">
         <div class="font-bold text-green-600 text-5xl">£{{ total_sales.amount__sum|floatformat:2 }}</div>
-        <!-- total_sales returns dictionary e.g. {'amount__sum': 120} -->
         <div class="mt-5">Total sales</div>
     </div>
 
     <div class="block border border-blue-200 p-10">
         <div class="font-bold text-blue-600 text-4xl">£{{ yearly_sales.amount__sum|floatformat:2 }}</div>
-        <!-- total_sales returns dictionary e.g. {'amount__sum': 120} -->
         <div class="mt-5">Last 365 days</div>
     </div>
 
     <div class="block border border-blue-200 p-10">
         <div class="font-bold text-orange-600 text-4xl">£{{ monthly_sales.amount__sum|floatformat:2 }}</div>
-        <!-- total_sales returns dictionary e.g. {'amount__sum': 120} -->
         <div class="mt-5">Last 30 days</div>
     </div>
 
     <div class="block border border-blue-200 p-10">
         <div class="font-bold text-purple-600 text-4xl">£{{ weekly_sales.amount__sum|floatformat:2 }}</div>
-        <!-- total_sales returns dictionary e.g. {'amount__sum': 120} -->
         <div class="mt-5">Last 7 days</div>
     </div>
 
@@ -124,10 +120,9 @@
 
         for (let i = 0; i < sums.length; i++) {
             let singleValue = sums[i].innerText;
-            let numericValue = parseFloat(singleValue.replace('£', '')); // converts string rep into a float, + removing the £ sign
+            let numericValue = parseFloat(singleValue.replace('£', ''));
             sum_values.push(numericValue)
         }
-        // now sum_values is an array of the daily sales e.g. [322, 53]
 
         // obtaining dates to use for labels
         const dates = document.getElementsByClassName('date-values')
@@ -155,7 +150,7 @@
                 },
                 plugins: {
                     legend: {
-                        display: false // Hide the legend
+                        display: false
                     }
                 }
             }
@@ -190,7 +185,6 @@
             }
             return repeatedColors;
         }
-        // e.g. 5 colours, will be repeated until the numRepeats is reaches, e.g. if 10 datapoints, each will be repeated twice. 1st loop pushes first value from colors, then until the last, then repeats the process
 
         const predefinedColors = ['#FF5733', '#33FF57', '#5733FF', '#FFFF33', '#33FFFF'];
 
@@ -216,10 +210,10 @@
                         beginAtZero: true
                     }
                 },
-                indexAxis: 'y', // changing to horizontal bar chart instead of vertical
+                indexAxis: 'y',
                 plugins: {
                     legend: {
-                        display: false // Hide the legend
+                        display: false
                     }
                 }
             }

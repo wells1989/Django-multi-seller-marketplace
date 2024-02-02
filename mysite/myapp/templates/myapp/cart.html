@@ -80,13 +80,9 @@
             method: 'POST',
             body: JSON.stringify({ 'email': email })
         })
-            /* Above fetch network request: Making a request to the url named 'api_checkout_session' giving the product id
-            .stringify converts  JS object (expects an object as it's argument) into a JSON string, converting it e.g. into a JSON string, e.g. {"email": "user@example.com"} This could be good for having multiple pieces of data in key-value pairs etc
-            ** alt to above, could do body: email, as the body can just be a single string value (and thus no need for .stringify method)
-            */
 
             .then(function (response) {
-                return response.json() // getting the json response, i.e. from the return JsonResponse({'sessionId:checkout_session.id'}) in create_checkout_session view
+                return response.json()
             }).then(function (session) {
                 console.log('Session received:', session);
                 return stripe.redirectToCheckout({ sessionId: session.sessionId }); //
@@ -98,18 +94,6 @@
                 console.log('Error:', error);
             });
     });
-    /*
-    NOTE: in create_checkout_session view, return JsonResponse({'sessionId': checkout_session.id})
-    So the first promise parses that response
-    the 2nd promise uses the session, i.e. the return value from the 1st promise, and redirects to stripe checkout, using the sessionID as the value of the 'sessionId' key in the response, i.e checkout_session.id
-    the 3rd promise takes the result (the return value from the 2nd)  and returns an error alert
-    the 4th promise takes the error from the 3rd and console logs it
-    */
-
-
-
-
-
 
 </script>
 

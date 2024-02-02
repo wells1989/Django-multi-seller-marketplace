@@ -15,7 +15,6 @@
         <div class="flex w-1/5">
             <img class="h-20 w-24" src="{{ product.file.url }}" alt="">
 
-            <!-- only showing the name and price normally, but on hover just showing the edit product, as it's absolute (shows over the other elements) with opacity of 100 on group hover (i.e. the relative-group) -->
             <div class="relative group">
                 <a href="{% url 'editproduct' product.id %}">
                     <div
