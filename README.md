@@ -49,7 +49,7 @@ Access the app at http://localhost:8000 in your web browser.
 ### Homepage
 - **Description:** Displays a dynamic homepage with featured products and links via the Navbar to the other areas if the User is logged in / authenticated
 
-![Screenshot (538)](https://github.com/wells1989/Full-stack-blog/assets/122035759/661b4282-932d-4c6a-aeef-dd0806990929)
+![Screenshot (549)](https://github.com/wells1989/Full-stack-blog/assets/122035759/f61bf836-9dad-46db-a829-38f922eb4510)
 
 ### Creating new product
 - **Description:** Provides a form for users to create and list new products for sale.
@@ -59,7 +59,7 @@ Access the app at http://localhost:8000 in your web browser.
 ### Product details / purchasing
 - **Description:** Product Details page which allows you to add or remove items from your cart
 
-![Screenshot (536)](https://github.com/wells1989/Full-stack-blog/assets/122035759/53ac1cc0-d5e5-497e-b92d-7faabbd0181e)
+![Screenshot (550)](https://github.com/wells1989/Full-stack-blog/assets/122035759/c85bdac7-d454-4b1e-8686-031e2fd0fa7b)
 
 - **Description:** cart View provides overview of Cart (Items / quantity / total price) before checking out
 
@@ -79,21 +79,21 @@ Access the app at http://localhost:8000 in your web browser.
 - **Description:** Users can retrieve sales data for their products, seeing the total sales or sales by time period, in table or chart form
 - **NOTE: superusers can see entire sales across users**
 
-![Screenshot (531)](https://github.com/wells1989/Full-stack-blog/assets/122035759/ba0d1e6a-1d41-4292-b63a-57a47c237383)
-![Screenshot (533)](https://github.com/wells1989/Full-stack-blog/assets/122035759/6c4e8e60-a423-4033-9a74-a0ed1b735e40)
+![Screenshot (547)](https://github.com/wells1989/Full-stack-blog/assets/122035759/67ecd1ee-38ca-49b6-a89f-094a5e4a2e6f)
+![Screenshot (548)](https://github.com/wells1989/Full-stack-blog/assets/122035759/cf2bdd3b-c93d-47be-ada0-4e7b30f2a56a)
 
 ### Viewing your purchases
-- **Description:** Users can view the orders they have made, as well as the amount they paid and can also leave a rating for the products
+- **Description:** Users can view the orders they have made, as well as the amount they paid and can also leave a 1-5 star rating for the products
 
-![Screenshot (534)](https://github.com/wells1989/Full-stack-blog/assets/122035759/f8b597fe-6c11-4c00-b68a-5d632345f4d7)
+![Screenshot (544)](https://github.com/wells1989/Full-stack-blog/assets/122035759/113395b5-64c9-47ba-94b9-a48b191c5a39)
 
 
 ### Project Notes:
 - The Focus of this project was to provide a wide view of functionality, including user authentication, model instance manipulation via Django forms / views with ORM and UI statistics obtained from SQL databases.
-- The App is designed to be used by both regularl users and superusers, superusers having more permissions on editing / deleting products, as well as being able to view the entire sales across the site.
+- The App is designed to be used by both regular users and superusers, with superusers having more permissions on editing / deleting products, as well as being able to view the entire sales across the site.
 - The Stripe Authentication was used with a dummy payment_intent due to an internal Stripe error when developing the product
 
 #### Future-development:
-- A future feature could be adding the reviews to the products in the index page, both the average review and allowing users to submit a comment with the review. This would require a separate Review Model, which could then be linked to a product whilst having it's own comments and review field.
-- A User profile section would allow users to customise and alter their Profile information in the event of changing email addresses etc.
+- A future feature could be adding a comments section to the product reviews. This would require a separate Review Model, which could then be linked to a product whilst having it's own comments and review field.
+- A User profile section onthe main site would allow users to customise and alter their Profile information in the event of changing email addresses etc.
 - The login feature could have incorporated a change password reset in case the user forgot their password.
