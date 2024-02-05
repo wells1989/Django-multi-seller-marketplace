@@ -2,7 +2,7 @@
 
 {% block body %}
 
-<div class="flex p-10 justify-center items-center">
+<div class="flex p-10 justify-center items-center mt-40">
     <!-- left div -->
     <div class="">
         <img class="max-h-80" src="{{ product.file.url }}""
@@ -14,6 +14,9 @@
         <div class="text-4xl mb-3">{{ product.name }}</div>
         <div class="mb-4">{{ product.description }}</div>
         <div class="mb-4 text-green-600 font-bold">£{{ product.price }}</div>
+        <div class="mb-4 text-orange-600 font-bold">
+            <span id="rating">{{ product.average_rating|floatformat:2 }} </span>
+        </div>
         <div>
             <a class="rounded-lg bg-green-500 hover:bg-green-700 font-bold text-white px-4 py-2" href="#"
                 onclick="addToCart('{{ product.id }}')">Add to cart</a>
@@ -31,6 +34,19 @@
 <script src="https://js.stripe.com/v3/"></script>
 
 <script type="text/javascript">
+
+    // adding stars to rating logic
+    const ratingElement = document.getElementById('rating')
+    const rating = ratingElement.innerHTML
+    const parsedRating = parseFloat(rating)
+
+    const fullStars = Math.floor(parsedRating);
+    /*const test = parsedRating + 5
+    alert(test) */
+    for (let i = 0; i < fullStars; i++) {
+        ratingElement.innerHTML += "★"
+    }
+
 
     // adding and removing from cart logic
     function addToCart(productId) {

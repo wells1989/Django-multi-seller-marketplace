@@ -27,12 +27,29 @@
             <div class="text-green-600 font-bold">
                 £{{ product.price }}
             </div>
+            <div class="text-orange-600 font-bold">
+                rating: {{ product.average_rating|floatformat:2 }}
+                <span id="rating-{{ product.id }}"></span>
+            </div>
             <div class="mt-5">
                 <a class="bg-green-500 hover:bg-green-700 rounded-lg text-white px-4 py-2"
                     href="{% url 'detail' product.id %}">View Details / Buy</a>
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ratingElement = document.getElementById('rating-{{ product.id }}');
+            const averageRating = parseFloat('{{ product.average_rating }}');
+            const fullStars = Math.floor(averageRating);
+
+            for (let i = 0; i < fullStars; i++) {
+                ratingElement.innerHTML += '★';
+            }
+
+        });
+    </script>
 
     {% endfor %}
 </div>

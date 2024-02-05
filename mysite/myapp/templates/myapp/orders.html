@@ -5,6 +5,7 @@
 <div class="m-20 w-full border-lg flex items-center">
     <h1 class="text-2xl text-center font-bold">Purchases linked to email</h1>
     <h2 class=" px-2 text-blue-700 text-2xl font-bold">{{ request.user.email }}</h2>
+
 </div>
 
 <div class="m-20">
@@ -13,6 +14,7 @@
     <div class="w-full font-bold text-xl border border-bottom-md p-3">
         {{ purchase.created_on }}
     </div>
+
     <div class="w-full border border-blue-300">
         <div class="flex justify-content items-center">
             <div class="w-1/4">
@@ -28,19 +30,62 @@
                     href="{% url 'detail' product.id %}">View Product</a>
             </div>
 
+            <!-- Styling and script for star functionality -->
+            <style>
+                /* Style for the empty / filled stars */
+                .star {
+                    font-size: 3xl;
+                    color: #ccc;
+                    cursor: pointer;
+                }
+
+                .star.filled {
+                    color: #fdd835;
+                }
+            </style>
+
+            <script>
+                document.addEventListener('DOMContentLoaded', function () {
+                    const stars = document.querySelectorAll('.star');
+
+                    stars.forEach((star, index) => {
+                        star.addEventListener('click', function () {
+                            stars.forEach(s => s.classList.remove('filled'));
+
+                            for (let i = 0; i <= index; i++) {
+                                stars[i].classList.add('filled');
+                            }
+
+                            document.querySelector('#rating').value = index + 1;
+                        });
+                    });
+                });
+            </script>
+
             <div class="w-1/4">
+                {% if user not in product.reviewed_by.all %}
                 <form method="post" action="{% url 'orders' %}" class="flex items-center">
                     {% csrf_token %}
                     <div>
                         <input type="hidden" name="order_id" value="{{ purchase.id }}">
                         <label for="rating" class="mr-2 w-full">Rating (0-5): </label>
-                        <input class="w-3/4 bg-blue-100 p-1 border rounded" type="number" name="rating" min="0" max="5">
+
+                        <!-- star rating system -->
+                        {% for i in '12345'|make_list %}
+                        <input type="radio" id="star{{ forloop.counter }}" name="rating" value="{{ forloop.counter }}"
+                            class="hidden">
+                        <label for="star{{ forloop.counter }}" class="cursor-pointer star">&#9733;</label>
+                        {% endfor %}
+
                     </div>
                     <button class="bg-purple-500 rounded m-2 hover:bg-purple-700 font-bold text-white px-2 py-1"
                         type="submit">
                         Submit Rating
                     </button>
                 </form>
+                {% else %}
+                <h3> You have already reviewed this product</h3>
+                {% endif %}
             </div>
         </div>
     </div>

@@ -7,6 +7,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <title>Document</title>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: white;
+            z-index: 1000;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            margin-top: 60px;
+        }
+    </style>
 </head>
 
 <body>
@@ -21,14 +41,14 @@
                 <span class="self-center text-xl font-bold">Digital Marketplace</span>
             </a>
             <div class="flex items-center">
-                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg" href="{% url 'index' %}">Home</a>
+                <a class="mr-5 text-md font-medium hover:bg-blue-200 p-2 rounded-lg" href="{% url 'index' %}">Home</a>
                 {% if user and user.is_authenticated %}
-                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg"
+                <a class="mr-5 text-md font-medium hover:bg-blue-200 p-2 rounded-lg"
                     href="{% url 'dashboard' %}">Dashboard</a>
-                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg" href="{% url 'sales' %}">Sales</a>
-                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg"
+                <a class="mr-5 text-md font-medium hover:bg-blue-200 p-2 rounded-lg" href="{% url 'sales' %}">Sales</a>
+                <a class="mr-5 text-md font-medium hover:bg-blue-200 p-2 rounded-lg"
                     href="{% url 'orders' %}">Orders</a>
-                <a class="mr-5 text-sm font-medium hover:bg-blue-200 p-2 rounded-lg"
+                <a class="mr-5 text-md font-medium hover:bg-blue-200 p-2 rounded-lg"
                     href="{% url 'createproduct' %}">Create Product</a>
                 <form action="{% url 'logout' %}" method="post">
                     {% csrf_token %}

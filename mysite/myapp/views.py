@@ -276,18 +276,13 @@ def sales(request):
 
     return render(request, 'myapp/sales.html', {'orders': orders, 'total_sales': total_sales, 'user': user, 'yearly_sales': yearly_sales, 'monthly_sales':monthly_sales, 'weekly_sales': weekly_sales, 'daily_sales_sums': daily_sales_sums, 'product_sales_sums':product_sales_sums})
 
-# orders view
-def orders(request):
 
-    purchases = OrderDetail.objects.filter(customer_email=request.user.email) 
-
-    return render(request, 'myapp/orders.html', {'purchases': purchases})
-
-# ratings view
+# orders / ratings view
 def orders(request):
     if request.method == 'POST':
         order_id = request.POST.get('order_id')
         rating = request.POST.get('rating')
+        user = request.user
         
         order_detail = OrderDetail.objects.get(id=order_id)
         order_detail.product_rating = rating
@@ -296,9 +291,9 @@ def orders(request):
         for product in order_detail.products.all():
             product.total_ratings += 1
             product.total_rating_value += int(rating)
+            product.reviewed_by.add(user)
             product.save()
 
-        # Calculate the average rating for each product after all ratings are updated
         for product in Product.objects.all():
             product.average_rating = product.calculate_average_rating()
             product.save()
